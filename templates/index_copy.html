@@ -1,0 +1,118 @@
+{% extends "import.html" %}
+{% block content %}
+
+
+<main>
+    <div class="form-right">
+        <h1>
+            Identify the
+        </h1>
+        <h1>Plant</h1>
+        <h1><span>Disease.</span></h1>
+        <form id="upload-file" method="post" enctype="multipart/form-data">
+            <input name="file" id="imageUpload" type="file" accept=".png, .jpg, .jpeg">
+        </form>
+    </div>
+
+    <div class="image-section" style="display:none;">
+        <h2>Your Image is</h2>
+        <div class="image">
+            <img id="imagePreview" src="#" alt="leaf" style="object-fit: cover; width: 100%; height: 100%;">
+        </div>
+        <div style="align-self: flex-start;">
+            <button type="submit" class="btn btn-danger btn-lg" id="btn-predict"
+                style="border-radius: 2rem;">Predict!</button>
+        </div>
+    </div>
+</main>
+
+<div class="loader" style="display:none;"></div>
+<div id="container2">
+    <div id="result"><span></span></div>
+    <div id="sol" class="box"><span></span></div>
+    <!-- <div id="links" class="box"></div> -->
+</div>
+
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+    integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    gsap.from(".left-sec a", {
+        duration: 0.75,
+        y: -20,
+        opacity: 0,
+        stagger: 0.35,
+        delay: 1
+    })
+
+    gsap.from(".right-sec a", {
+        duration: 0.75,
+        y: -50,
+        opacity: 0,
+        delay: 1
+    })
+
+    gsap.from(".form-right h1, .form-right h1 span", {
+        duration: 0.75,
+        y: 30,
+        opacity: 0,
+        delay: 1.5,
+        stagger: 0.35
+    })
+
+    gsap.from(".form-right form input", {
+        duration: 0.75,
+        width: 0,
+        opacity: 0,
+        delay: 2.5
+    })
+
+
+
+    $(document).ready(function () {
+        // ... (rest of the code)
+
+        // Predict
+        $('#btn-predict').click(function () {
+            // ... (rest of the code)
+
+            // Make prediction by calling api /predict
+            $.ajax({
+                // ... (rest of the code)
+                success: function (data) {
+                    // ... (rest of the code)
+                    $('#result').html('<h3>Result:</h3>' + data.label);
+
+                    let solutionHtml = '<h3>Solution:</h3><ul>';
+                    data.solution.forEach(item => {
+                        if (item.trim()) {
+                            solutionHtml += '<li>' + item.trim() + '</li>';
+                        }
+                    });
+                    solutionHtml += '</ul>';
+                    $('#container2').append(solutionHtml);
+
+                    if (data.links && data.links.length > 0) {
+                        let videoLinksHtml = '<h3>Video Links:</h3><ul>';
+                        data.links.forEach(link => {
+                            videoLinksHtml += `<li><a href="${link}" target="_blank">${link}</a></li>`;
+                        });
+                        videoLinksHtml += '</ul>';
+                        $('#container2').append(videoLinksHtml);
+                    } else {
+                        $('#container2').append('<p>No video links found.</p>');
+                    }
+
+                    console.log('Success!');
+                },
+                // ... (rest of the code)
+            });
+        });
+
+        // ... (rest of the code)
+    });
+</script>
+{% endblock %}
